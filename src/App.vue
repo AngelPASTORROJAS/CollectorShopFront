@@ -46,6 +46,16 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.app-container {
+  padding-top: 80px;
+}
+
+.page-wrapper {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  min-height: calc(100dvh - 80px);
+}
+
 /* Tes styles restent corrects, ils sont maintenant bien liés au template */
 .navbar {
   position: fixed;
