@@ -8,5 +8,5 @@ interface CollectorApiType {
 
 export const collectorAPI: CollectorApiType = {
   auth: new AuthResource(),
-  items: new ItemsResource(), // À implémenter sur le même modèle
+  items: new ItemsResource(),
 };
