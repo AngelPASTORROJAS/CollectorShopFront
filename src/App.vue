@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
+const route = useRoute()
 
 onMounted(async () => {
   await authStore.checkAuth()
@@ -22,17 +23,14 @@ onMounted(async () => {
         <div class="logo">
           <RouterLink to="/">Collector.shop</RouterLink>
         </div>
-
         <nav class="nav-links">
           <RouterLink to="/" class="nav-link">Catalogue</RouterLink>
         </nav>
-
         <div class="user-menu">
           <template v-if="authStore.isAuthenticated && authStore.user">
-            <span class="user-name">👋 {{ authStore.user.BusinessName || 'Entreprise' }}</span>
+            <span class="user-name">{{ authStore.user.BusinessName || 'Entreprise' }}</span>
             <button @click="authStore.logout()" class="btn btn-secondary">Déconnexion</button>
           </template>
-
           <div v-else class="auth-buttons">
             <RouterLink to="/login" class="btn btn-secondary">Connexion</RouterLink>
             <RouterLink to="/register" class="btn btn-primary">S'inscrire</RouterLink>
@@ -41,7 +39,7 @@ onMounted(async () => {
       </div>
     </header>
 
-    <main class="page-wrapper container">
+    <main class="page-wrapper container" :class="route.meta.isAuthPage ? 'auth-layout' : 'standard-layout'">
       <RouterView />
     </main>
   </div>

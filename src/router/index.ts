@@ -27,12 +27,14 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/AuthView.vue') // Gère login + register sur la même vue
+      component: () => import('../views/AuthView.vue'),
+      meta: { isAuthPage: true }
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../views/AuthView.vue')
+      component: () => import('../views/AuthView.vue'),
+      meta: { isAuthPage: true }
     }
   ]
 })
