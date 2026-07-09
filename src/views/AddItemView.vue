@@ -10,7 +10,7 @@ const authStore = useAuthStore()
 // Utilisation des propriétés en PascalCase pour le DTO de création
 const formData = ref({
   Title: '',
-  CategoryCode: 'Figurines',
+  CategoryCode: 'ACTION_FIGURE',
   Price: 0,
   Description: '',
 })
@@ -57,10 +57,10 @@ const submitForm = async () => {
           <div class="form-group w-full">
             <label class="form-label">Catégorie</label>
             <select v-model="formData.CategoryCode" class="form-input" required>
-              <option value="Figurines">Figurines</option>
-              <option value="Sneakers">Sneakers</option>
-              <option value="Jeux Vidéo">Jeux Vidéo</option>
-              <option value="Cartes">Cartes à collectionner</option>
+              <option value="ACTION_FIGURE">Figurines d'Action</option>
+              <option value="ANCIENT_COIN">Pièces de Monnaie Anciennes</option>
+              <option value="CONSOLES">Jeux Vidéo</option>
+              <option value="POKEMON_CARD">Cartes Pokémon</option>
             </select>
           </div>
 

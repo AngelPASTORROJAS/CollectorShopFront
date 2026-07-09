@@ -25,6 +25,7 @@ onMounted(async () => {
         </div>
         <nav class="nav-links">
           <RouterLink to="/" class="nav-link">Catalogue</RouterLink>
+          <RouterLink v-if="authStore.isAuthenticated" to="/add-item" class="nav-link btn-sell">Vendre un objet</RouterLink>
         </nav>
         <div class="user-menu">
           <template v-if="authStore.isAuthenticated && authStore.user">
@@ -55,6 +56,16 @@ onMounted(async () => {
   padding-bottom: 2rem;
   min-height: calc(100dvh - 80px);
 }
+
+.btn-sell {
+    background: var(--color-primary);
+    color: white !important;
+    font-weight: 600;
+
+    &:hover {
+      background: var(--color-primary-hover);
+    }
+  }
 
 /* Tes styles restent corrects, ils sont maintenant bien liés au template */
 .navbar {
