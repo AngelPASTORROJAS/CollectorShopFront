@@ -154,6 +154,7 @@ a:hover {
 }
 
 .page-wrapper {
-  padding-top: 5rem; /* Space for fixed header */
-  padding-bottom: 3rem;
+  padding-top: 80px; /* C'est ici qu'on gère l'espace pour la navbar fixe */
+  box-sizing: border-box;
+  min-height: 100vh; /* S'assure que le fond prend tout l'écran */
 }

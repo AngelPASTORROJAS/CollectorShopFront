@@ -173,8 +173,9 @@ async function handleSubmit() {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 120px);
-  margin-top: 80px;
+  min-height: calc(100dvh - 80px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-card {

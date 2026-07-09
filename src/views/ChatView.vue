@@ -102,7 +102,7 @@ const send = async () => {
 
 <style scoped>
 .chat-page {
-  height: calc(100vh - 8rem);
+  height: calc(100dvh - 8rem);
   display: flex;
   align-items: center;
   justify-content: center;
