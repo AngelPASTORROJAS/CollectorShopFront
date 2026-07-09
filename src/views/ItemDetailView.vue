@@ -23,7 +23,7 @@ onMounted(async () => {
   }
 })
 
-const contactSeller = () => {
+const contactForItem = () => {
   if (!authStore.isAuthenticated) {
     router.push('/login')
     return
@@ -32,6 +32,7 @@ const contactSeller = () => {
     router.push(`/chat/${item.value.Id}`)
   }
 }
+
 </script>
 
 <template>
@@ -60,13 +61,12 @@ const contactSeller = () => {
 
         <div class="actions">
           <button
-            v-if="authStore.user?.Id !== item.OwnerId"
-            class="btn btn-primary btn-large w-full"
-            @click="contactSeller"
+            class="btn btn-large w-full"
+            :class="authStore.user?.Id !== item.OwnerId ? 'btn-primary' : 'btn-secondary'"
+            @click="contactForItem"
           >
-            Contacter le vendeur
+            {{ authStore.user?.Id !== item.OwnerId ? "Contacter le vendeur" : "Vérifier vos messages" }}
           </button>
-          <div v-else class="owner-notice">Ceci est votre article.</div>
         </div>
       </div>
     </div>

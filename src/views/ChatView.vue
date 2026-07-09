@@ -39,11 +39,9 @@ const scrollToBottom = async () => {
 }
 
 const send = async () => {
-  // Utilisation de authStore.user?.Id (le DTO d'authentification)
   if (!newMessage.value.trim() || !item.value || !authStore.user?.Id) return
 
-  // Logique d'envoi : on envoie au OwnerId (vendeur)
-  await chatStore.sendMessage({
+  await chatStore.sendMessage(item.value.Id, {
     ReceiverId: item.value.OwnerId,
     Content: newMessage.value
   })
