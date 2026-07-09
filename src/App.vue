@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
@@ -13,39 +12,43 @@ onMounted(async () => {
 
 <template>
   <div v-if="authStore.isCheckingAuth" class="app-loading">
-    Chargement de la session...
-  </div>
-  <div v-else>
-  <header class="navbar glass-panel">
-    <div class="nav-container">
-      <div class="logo">
-        <RouterLink to="/">Collector.shop</RouterLink>
-      </div>
-      <nav class="nav-links">
-        <RouterLink to="/" class="nav-link">Catalogue</RouterLink>
-        <RouterLink v-if="currentUser" to="/add-item" class="nav-link">Vendre un objet</RouterLink>
-      </nav>
-      <div class="user-menu">
-        <div v-if="currentUser" class="user-profile">
-          <img :src="currentUser.avatar || 'https://via.placeholder.com/32'" alt="Avatar" class="avatar" />
-          <span>{{ currentUser.name }}</span>
-          <button @click="authStore.logout()" class="btn btn-outline btn-sm">Quitter</button>
-        </div>
-        <div v-else class="auth-buttons">
-          <RouterLink to="/login" class="btn btn-outline btn-sm">Connexion</RouterLink>
-          <RouterLink to="/register" class="btn btn-primary btn-sm ml-2">S'inscrire</RouterLink>
-        </div>
-      </div>
-    </div>
-  </header>
+    <div class="spinner"></div>
+    <p>Chargement de la session...</p>
   </div>
 
-  <main class="page-wrapper container">
-    <RouterView />
-  </main>
+  <div v-else class="app-container">
+    <header class="navbar glass-panel">
+      <div class="nav-container">
+        <div class="logo">
+          <RouterLink to="/">Collector.shop</RouterLink>
+        </div>
+
+        <nav class="nav-links">
+          <RouterLink to="/" class="nav-link">Catalogue</RouterLink>
+        </nav>
+
+        <div class="user-menu">
+          <template v-if="authStore.isAuthenticated && authStore.user">
+            <span class="user-name">👋 {{ authStore.user.BusinessName || 'Entreprise' }}</span>
+            <button @click="authStore.logout()" class="btn btn-secondary">Déconnexion</button>
+          </template>
+
+          <div v-else class="auth-buttons">
+            <RouterLink to="/login" class="btn btn-secondary">Connexion</RouterLink>
+            <RouterLink to="/register" class="btn btn-primary">S'inscrire</RouterLink>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-wrapper container">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+/* Tes styles restent corrects, ils sont maintenant bien liés au template */
 .navbar {
   position: fixed;
   top: 0;
@@ -84,6 +87,7 @@ onMounted(async () => {
       font-weight: 500;
       padding: 0.5rem 1rem;
       border-radius: var(--border-radius);
+      text-decoration: none;
 
       &:hover,
       &.router-link-active {
@@ -96,34 +100,12 @@ onMounted(async () => {
   .user-menu {
     display: flex;
     align-items: center;
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 2px solid var(--color-primary);
-      }
-    }
-
-    .auth-buttons {
-      display: flex;
-      align-items: center;
-    }
+    gap: 1rem;
   }
 }
 
-// Utilitaires transversaux qui restent en dehors de la navbar
-.btn-sm {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.875rem;
-}
-
-.ml-2 {
-  margin-left: 0.5rem;
+.user-name {
+  color: var(--color-text-primary);
+  font-weight: 600;
 }
 </style>
