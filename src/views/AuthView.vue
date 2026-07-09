@@ -181,7 +181,7 @@ async function handleSubmit() {
 .auth-card {
   width: 100%;
   max-width: 450px;
-  padding: 2.5rem;
+  padding: 2rem; /* Réduit pour gagner de la hauteur */
   border-radius: var(--border-radius);
 }
 
@@ -195,14 +195,14 @@ h2 {
 .subtitle {
   color: var(--color-text-secondary);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   font-size: 0.95rem;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .form-group {
@@ -217,7 +217,7 @@ h2 {
 }
 
 .form-group input {
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 1rem;
   border-radius: var(--border-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(0, 0, 0, 0.2);
@@ -243,7 +243,7 @@ h2 {
 }
 
 .auth-toggle {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   text-align: center;
   font-size: 0.9rem;
   color: var(--color-text-secondary);
