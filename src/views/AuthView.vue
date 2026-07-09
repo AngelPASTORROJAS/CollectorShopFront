@@ -168,7 +168,7 @@ async function handleSubmit() {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .auth-wrapper {
   display: flex;
   justify-content: center;
@@ -176,99 +176,75 @@ async function handleSubmit() {
   min-height: calc(100dvh - 80px);
   width: 100%;
   box-sizing: border-box;
-}
 
-.auth-card {
-  width: 100%;
-  max-width: 450px;
-  padding: 2rem; /* Réduit pour gagner de la hauteur */
-  border-radius: var(--border-radius);
-}
+  .auth-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    border-radius: var(--border-radius);
 
-h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
 
-.subtitle {
-  color: var(--color-text-secondary);
-  text-align: center;
-  margin-bottom: 1.25rem;
-  font-size: 0.95rem;
-}
+    .subtitle {
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+  }
 
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
 
-.form-group label {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
 
-.form-group input {
-  padding: 0.65rem 1rem;
-  border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
+      input {
+        padding: 0.65rem 1rem;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 1rem;
+        transition: border-color 0.2s;
 
-.form-group input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
+        &:focus {
+          outline: none;
+          border-color: var(--color-primary);
+        }
+      }
+    }
+  }
 
-.form-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
+  .auth-toggle {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
 
-.w-full {
-  width: 100%;
-}
+    .link {
+      color: var(--color-primary);
+      font-weight: 600;
+      text-decoration: none;
 
-.auth-toggle {
-  margin-top: 1rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.link {
-  color: var(--color-primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-.alert {
-  padding: 0.75rem 1rem;
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-  margin-bottom: 1.25rem;
-}
-
-.error-alert {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgb(239, 68, 68);
-  color: #fca5a5;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 </style>
