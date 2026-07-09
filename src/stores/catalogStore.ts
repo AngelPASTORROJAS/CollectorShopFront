@@ -1,32 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { CollectibleItem } from '@/types'
+import type { CollectibleItemDto } from '@/types/models'
 import { ApiService } from '@/services/apiService'
 
 export const useCatalogStore = defineStore('catalog', () => {
-  const items = ref<CollectibleItem[]>([])
+  const items = ref<CollectibleItemDto[]>([])
   const isLoading = ref(false)
 
-  const validatedItems = computed(() => items.value.filter((item) => item.status === 'validated'))
+  // On filtre sur AVAILABLE (au cas où, même si le SQL le fait déjà)
+  const availableItems = computed(() =>
+    items.value.filter((item) => item.Status === 'AVAILABLE')
+  )
 
   const fetchItems = async () => {
     isLoading.value = true
     try {
-      items.value = await ApiService.getItems()
+      items.value = await ApiService.getItems() // Doit renvoyer un CollectibleItemDto[]
     } finally {
       isLoading.value = false
     }
   }
 
-  const addItem = async (itemData: Partial<CollectibleItem>) => {
-    isLoading.value = true
-    try {
-      const newItem = await ApiService.createItem(itemData)
-      items.value.push(newItem)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  return { items, validatedItems, isLoading, fetchItems, addItem }
+  return { items, availableItems, isLoading, fetchItems }
 })

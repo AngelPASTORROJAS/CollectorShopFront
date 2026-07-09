@@ -1,43 +1,37 @@
 import { apiClient } from "../clients/apiClient";
-import type { ItemRequest, ItemResponse } from "@/types/models";
+import type { CollectibleItemDto, ItemCreateDto } from "@/types/models";
 
 export class ItemsResource {
   /**
-   * Récupère la liste de tous les articles de la boutique
+   * Récupère la liste de tous les articles du catalogue (via api_load_catalog_ram)
    */
-  public async getAllAsync(): Promise<ItemResponse[]> {
-    const response = await apiClient.get<ItemResponse[]>("/api/items");
+  public async getAllAsync(): Promise<CollectibleItemDto[]> {
+    const response = await apiClient.get<CollectibleItemDto[]>("/api/items");
     return response.data;
   }
 
   /**
-   * Récupère les détails d'un article spécifique par son identifiant
+   * Récupère les détails d'un article par son identifiant unique
    */
-  public async getByIdAsync(id: number): Promise<ItemResponse> {
-    const response = await apiClient.get<ItemResponse>(`/api/items/${id}`);
+  public async getByIdAsync(id: number): Promise<CollectibleItemDto> {
+    const response = await apiClient.get<CollectibleItemDto>(`/api/items/${id}`);
     return response.data;
   }
 
   /**
-   * Crée un nouvel article (Action généralement protégée par rôle Admin côté C#)
+   * Crée un nouvel article de collection (génère un ID côté DB)
    */
-  public async createAsync(payload: ItemRequest): Promise<ItemResponse> {
-    const response = await apiClient.post<ItemResponse>("/api/items", payload);
+  public async createAsync(payload: ItemCreateDto): Promise<number> {
+    // Ton API C# retourne l'ID long créé ou -1
+    const response = await apiClient.post<number>("/api/items", payload);
     return response.data;
   }
 
   /**
-   * Met à jour un article existant
+   * Supprime logiciellement (soft delete) un article
    */
-  public async updateAsync(id: number, payload: ItemRequest): Promise<ItemResponse> {
-    const response = await apiClient.put<ItemResponse>(`/api/items/${id}`, payload);
+  public async deleteAsync(id: number): Promise<boolean> {
+    const response = await apiClient.delete<boolean>(`/api/items/${id}`);
     return response.data;
-  }
-
-  /**
-   * Supprime un article
-   */
-  public async deleteAsync(id: number): Promise<void> {
-    await apiClient.delete(`/api/items/${id}`);
   }
 }

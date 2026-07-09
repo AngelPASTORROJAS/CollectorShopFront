@@ -1,39 +1,58 @@
-// Payload pour la création ou modification d'un article
-export interface ItemRequest {
-  Title: string;
-  Description: string;
-  Price: number;
-  StockQuantity: number;
-  ImageUrl?: string;
-}
-
-export interface ItemResponse {
-  Id: number;
-  Title: string;
-  Description: string;
-  Price: number;
-  StockQuantity: number;
-  ImageUrl: string;
-  CreatedAt: string;
-}
-
+// Payload pour l'authentification
 export interface LoginRequest {
   Email: string;
   Password: string;
   RememberMe?: boolean;
 }
 
-// Corrigé pour correspondre au record C# RegisterRequest
 export interface RegisterRequest {
-  BusinessName: string; // Remplacé Username par BusinessName
+  BusinessName: string;
   Email: string;
   Password: string;
-  ConfirmPassword?: string; // Optionnel (utilisé uniquement côté Front pour la validation)
+  ConfirmPassword?: string; // Côté Vue uniquement pour la validation
 }
 
-// Correspond au record C# AuthUserDto
 export interface AuthUserDto {
   Id: number;
-  BusinessName?: string; // Selon ce que ton /api/auth/me renvoie en plus de l'Id
+  BusinessName?: string;
   Email?: string;
+}
+
+// ---- NOUVEAUX TYPES COLLECTOR ----
+
+// Correspond à CollectibleItemDto
+export interface CollectibleItemDto {
+  Id: number;
+  CategoryCode: string;
+  OwnerId: number;
+  Title: string;
+  Description: string;
+  Price: number;
+  Status: string;
+  MetadataJson: string; // JSON stringifié
+}
+
+// Correspond à ItemCreateDto (Payload envoyé pour la création)
+export interface ItemCreateDto {
+  CategoryCode: string;
+  Title: string;
+  Description: string;
+  Price: number;
+  MetadataJson?: string;
+}
+
+// Correspond à ChatMessageDto
+export interface ChatMessageDto {
+  Id: number;
+  ItemId: number;
+  SenderId: number;
+  ReceiverId: number;
+  Content: string;
+  CreatedAt: string; // Représente le DateTime C# au format ISO string
+}
+
+// Correspond à ChatSendMessageDto
+export interface ChatSendMessageDto {
+  ReceiverId: number;
+  Content: string;
 }

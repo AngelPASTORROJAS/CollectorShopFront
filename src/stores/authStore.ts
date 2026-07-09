@@ -1,99 +1,29 @@
+// src/stores/authStore.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { LoginRequest, RegisterRequest } from '@/types/models'
-import { collectorAPI } from '@/api'
-
-// On définit l'interface User pour le front (adapter selon ce que retourne /api/auth/me)
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+import type { AuthUserDto } from '@/types/models'
+import { ApiService } from '@/services/apiService' // Ou ton AuthResource
 
 export const useAuthStore = defineStore('auth', () => {
-  const currentUser = ref<User | null>(null)
-  const isLoading = ref<boolean>(false)
-  const error = ref<string | null>(null)
+  const user = ref<AuthUserDto | null>(null)
+  const isAuthenticated = ref(false)
+  const isCheckingAuth = ref(true) // Pour éviter les flashs d'interface pendant l'appel
 
-  /**
-   * Connexion de l'utilisateur
-   */
-  const loginAsync = async (payload: LoginRequest): Promise<void> => {
-    isLoading.value = true
-    error.value = null
+  const checkAuth = async () => {
+    isCheckingAuth.value = true
     try {
-      // 1. Appel API : Le serveur valide et pose le cookie HTTP-Only
-      const success = await collectorAPI.auth.loginAsync(payload)
-
-      if (success) {
-        // 2. On récupère le profil de l'utilisateur fraîchement connecté
-        await fetchCurrentUserAsync()
-      } else {
-        error.value = 'Identifiants invalides.'
-        throw new Error('Identifiants invalides.')
-      }
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Erreur lors de la connexion'
-      throw e // On propage l'erreur pour que le composant AuthView puisse l'intercepter
+      // Cet appel envoie automatiquement le cookie au backend C#
+      const currentUser = await ApiService.auth.getCurrentUser() // Ajuste selon ta méthode pour GET /api/auth/me
+      user.value = currentUser
+      isAuthenticated.value = true
+    } catch (error) {
+      // Cookie invalide ou expiré, on nettoie l'état
+      user.value = null
+      isAuthenticated.value = false
     } finally {
-      isLoading.value = false
+      isCheckingAuth.value = false
     }
   }
 
-  /**
-   * Inscription d'un nouvel utilisateur
-   */
-   const registerAsync = async (payload: RegisterRequest): Promise<void> => {
-     isLoading.value = true
-     error.value = null
-     try {
-       await collectorAPI.auth.registerAsync(payload)
-     } catch (e: unknown) {
-       error.value = e instanceof Error ? e.message : "Erreur lors de l'inscription"
-       throw e
-     } finally {
-       isLoading.value = false
-     }
-   }
-
-  /**
-   * Récupère les données de l'utilisateur connecté
-   */
-   const fetchCurrentUserAsync = async (): Promise<void> => {
-       try {
-         const data = await collectorAPI.auth.getMeAsync()
-
-         currentUser.value = {
-           id: data.Id ?? (data as any).id, // Gère le PascalCase de C# ou le camelCase standard
-           name: data.BusinessName ?? (data as any).businessName ?? 'Entreprise',
-           email: data.Email ?? (data as any).email ?? ''
-         }
-       } catch {
-         currentUser.value = null
-       }
-     }
-  /**
-   * Déconnexion
-   */
-  const logout = async (): Promise<void> => {
-    try {
-      await collectorAPI.auth.logoutAsync()
-    } catch (e) {
-      console.error('Erreur lors de la déconnexion backend', e)
-    } finally {
-      // Dans tous les cas, on nettoie le state côté front
-      currentUser.value = null
-    }
-  }
-
-  return {
-    currentUser,
-    isLoading,
-    error,
-    loginAsync,
-    registerAsync,
-    fetchCurrentUserAsync,
-    logout
-  }
+  return { user, isAuthenticated, isCheckingAuth, checkAuth }
 })

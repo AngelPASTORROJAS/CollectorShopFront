@@ -2,12 +2,20 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
-const { currentUser } = storeToRefs(authStore)
+
+onMounted(async () => {
+  await authStore.checkAuth()
+})
 </script>
 
 <template>
+  <div v-if="authStore.isCheckingAuth" class="app-loading">
+    Chargement de la session...
+  </div>
+  <div v-else>
   <header class="navbar glass-panel">
     <div class="nav-container">
       <div class="logo">
@@ -30,6 +38,7 @@ const { currentUser } = storeToRefs(authStore)
       </div>
     </div>
   </header>
+  </div>
 
   <main class="page-wrapper container">
     <RouterView />
