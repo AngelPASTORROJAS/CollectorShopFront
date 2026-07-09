@@ -1,31 +1,32 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { collectorAPI } from '@/api'
 import { useChatStore } from '@/stores/chatStore'
 import { useAuthStore } from '@/stores/authStore'
-import { ApiService } from '@/services/apiService'
-import type { CollectibleItem } from '@/types'
+import type { CollectibleItemDto } from '@/types/models'
 
 const route = useRoute()
 const router = useRouter()
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 
-const item = ref<CollectibleItem | null>(null)
+const item = ref<CollectibleItemDto | null>(null)
 const newMessage = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
 
 onMounted(async () => {
-  if (!authStore.currentUser) {
-    router.push('/')
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
     return
   }
 
-  const itemId = route.params.itemId as string
-  item.value = (await ApiService.getItemById(itemId)) || null
+  const itemId = Number(route.params.itemId)
+  item.value = await collectorAPI.items.getByIdAsync(itemId)
 
   if (item.value) {
-    await chatStore.fetchMessages(item.value.id)
+    // Utilisation de la logique du store (assure-toi qu'il utilise aussi collectorAPI)
+    await chatStore.fetchMessages(item.value.Id)
     scrollToBottom()
   }
 })
@@ -38,29 +39,32 @@ const scrollToBottom = async () => {
 }
 
 const send = async () => {
-  if (!newMessage.value.trim() || !item.value || !authStore.currentUser) return
+  // Utilisation de authStore.user?.Id (le DTO d'authentification)
+  if (!newMessage.value.trim() || !item.value || !authStore.user?.Id) return
 
-  // Si je suis le vendeur, j'envoie à l'acheteur. Si je suis l'acheteur, j'envoie au vendeur.
-  // Pour le POC, on suppose qu'il n'y a qu'un seul acheteur potentiel (u2 - Bob)
-  const receiverId = authStore.currentUser.id === item.value.sellerId ? 'u2' : item.value.sellerId
+  // Logique d'envoi : on envoie au OwnerId (vendeur)
+  await chatStore.sendMessage({
+    ReceiverId: item.value.OwnerId,
+    Content: newMessage.value
+  })
 
-  await chatStore.sendMessage(item.value.id, authStore.currentUser.id, receiverId, newMessage.value)
   newMessage.value = ''
   scrollToBottom()
 }
 </script>
 
 <template>
-  <div class="chat-page animate-fade-in" v-if="item && authStore.currentUser">
+  <div class="chat-page animate-fade-in" v-if="item && authStore.user">
     <div class="chat-container glass-panel">
       <!-- Header -->
       <div class="chat-header">
         <button class="btn btn-outline btn-sm" @click="router.back()">← Retour</button>
         <div class="item-info">
-          <img :src="item.imageUrl" class="thumb" />
+          <!-- Image placeholder cohérente -->
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=100" class="thumb" />
           <div>
-            <h3>Discussion : {{ item.title }}</h3>
-            <p class="subtitle">Vendeur : {{ item.sellerName }}</p>
+            <h3>{{ item.Title }}</h3>
+            <p class="subtitle">Propriétaire : #{{ item.OwnerId }}</p>
           </div>
         </div>
       </div>
@@ -69,15 +73,13 @@ const send = async () => {
       <div class="chat-messages" ref="messagesContainer">
         <div
           v-for="msg in chatStore.messages"
-          :key="msg.id"
+          :key="msg.Id"
           class="message-wrapper"
-          :class="{ mine: msg.senderId === authStore.currentUser.id }"
+          :class="{ mine: msg.SenderId === authStore.user.Id }"
         >
           <div class="message-bubble">
-            <p>{{ msg.content }}</p>
-            <span class="time">{{
-              new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }}</span>
+            <p>{{ msg.Content }}</p>
+            <span class="time">{{ new Date(msg.CreatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
           </div>
         </div>
         <div v-if="chatStore.messages.length === 0" class="empty-state">
@@ -100,9 +102,9 @@ const send = async () => {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .chat-page {
-  height: calc(100dvh - 8rem);
+  height: calc(100dvh - 12rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,29 +127,22 @@ const send = async () => {
   align-items: center;
   gap: 1.5rem;
   background: rgba(0, 0, 0, 0.2);
-}
 
-.item-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+  .item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-.thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  object-fit: cover;
-}
+    .thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
 
-.item-info h3 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-.item-info p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
+    h3 { margin: 0; font-size: 1.1rem; }
+    .subtitle { margin: 0; font-size: 0.8rem; color: var(--color-text-secondary); }
+  }
 }
 
 .chat-messages {
@@ -157,45 +152,39 @@ const send = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
 
-.message-wrapper {
-  display: flex;
-  width: 100%;
-}
+  .message-wrapper {
+    display: flex;
+    width: 100%;
 
-.message-wrapper.mine {
-  justify-content: flex-end;
-}
+    &.mine { justify-content: flex-end; }
 
-.message-bubble {
-  max-width: 70%;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  position: relative;
-}
+    .message-bubble {
+      max-width: 70%;
+      padding: 1rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
 
-.message-wrapper.mine .message-bubble {
-  background: var(--color-primary);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
+    &.mine .message-bubble {
+      background: var(--color-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
 
-.message-wrapper:not(.mine) .message-bubble {
-  border-bottom-left-radius: 4px;
-}
+    &:not(.mine) .message-bubble {
+      border-bottom-left-radius: 4px;
+    }
+  }
 
-.message-bubble p {
-  margin: 0;
-}
-
-.time {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  display: block;
-  text-align: right;
-  margin-top: 0.5rem;
+  .time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    display: block;
+    text-align: right;
+    margin-top: 0.5rem;
+  }
 }
 
 .chat-input-area {
