@@ -25,7 +25,7 @@ body {
   background-color: var(--color-bg-dark);
   color: var(--color-text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -156,5 +156,5 @@ a:hover {
 .page-wrapper {
   padding-top: 80px; /* C'est ici qu'on gère l'espace pour la navbar fixe */
   box-sizing: border-box;
-  min-height: 100vh; /* S'assure que le fond prend tout l'écran */
+  min-height: 100dvh; /* S'assure que le fond prend tout l'écran */
 }
