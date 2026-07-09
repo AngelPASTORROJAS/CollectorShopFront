@@ -7,8 +7,8 @@ export interface User {
 }
 
 export interface CollectibleItem {
-  id: string;
-  title: string;
+  id: number;
+  title: number;
   description: string;
   price: number;
   shippingCost: number;
