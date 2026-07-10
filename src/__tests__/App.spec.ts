@@ -3,10 +3,14 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import App from '../App.vue'
 
-// On mocke vue-router de manière isolée en typant le mock de la fonction
-vi.mock('vue-router', () => ({
-  useRoute: vi.fn<() => unknown>(() => ({ path: '/' }))
-}))
+// On mocke uniquement useRoute en conservant RouterLink et le reste du module
+vi.mock('vue-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('vue-router')>()
+  return {
+    ...actual,
+    useRoute: vi.fn<() => unknown>(() => ({ path: '/' }))
+  }
+})
 
 describe('App', () => {
   beforeEach(() => {
@@ -16,7 +20,8 @@ describe('App', () => {
   it('mounts renders properly', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        stubs: ['RouterLink', 'RouterView']
       }
     })
     expect(wrapper.exists()).toBe(true)
