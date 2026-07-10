@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
       const currentUser = await collectorAPI.auth.getMeAsync()
       user.value = currentUser
       isAuthenticated.value = true
-    } catch (err) {
+    } catch {
       // Si le cookie est absent/expiré (401), on reset le store tranquillement sans crash
       user.value = null
       isAuthenticated.value = false
@@ -46,8 +46,9 @@ export const useAuthStore = defineStore('auth', () => {
       } else {
         throw new Error('Identifiants invalides.')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la connexion.'
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la connexion.'
+      error.value = message
       throw err
     } finally {
       isLoading.value = false
@@ -62,8 +63,9 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       await collectorAPI.auth.registerAsync(payload)
-    } catch (err: any) {
-      error.value = err.message || "Erreur lors de l'inscription."
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de l'inscription."
+      error.value = message
       throw err
     } finally {
       isLoading.value = false
