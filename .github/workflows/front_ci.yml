@@ -11,6 +11,11 @@ jobs:
   quality-and-tests:
     name: 🧪 Quality, Lint & Tests
     runs-on: ubuntu-latest
+
+    permissions:
+          issues: write
+          contents: read
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
