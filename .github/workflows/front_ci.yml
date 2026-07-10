@@ -27,7 +27,7 @@ jobs:
           run_install: false
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --workspace-root
 
       - name: 🚀 Fast Linting (Oxlint Rust)
         run: pnpm lint:oxlint
