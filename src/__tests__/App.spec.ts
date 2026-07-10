@@ -1,32 +1,47 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { createRouter, createWebHistory } from 'vue-router'
 import App from '../App.vue'
-
-// On mocke uniquement useRoute en conservant RouterLink et le reste du module
-vi.mock('vue-router', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('vue-router')>()
-  return {
-    ...actual,
-    useRoute: vi.fn<() => unknown>(() => ({
-      path: '/',
-      meta: { isAuthPage: false }
-    }))
-  }
-})
+import { useAuthStore } from '@/stores/authStore'
 
 describe('App', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: '/',
+        component: { template: '<div>Home</div>' },
+        meta: { isAuthPage: false }
+      }
+    ]
   })
 
-  it('mounts renders properly', () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+    router.push('/')
+    await router.isReady()
+  })
+
+  it('mounts renders properly', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+
+    const authStore = useAuthStore()
+    authStore.isCheckingAuth = false
+    authStore.isAuthenticated = false
+    authStore.user = null
+
     const wrapper = mount(App, {
       global: {
-        plugins: [createPinia()],
-        stubs: ['RouterLink', 'RouterView']
+        plugins: [pinia, router],
+        stubs: {
+          RouterLink: true,
+          RouterView: true
+        }
       }
     })
+
     expect(wrapper.exists()).toBe(true)
   })
 })
