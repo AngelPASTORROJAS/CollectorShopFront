@@ -82,17 +82,20 @@ jobs:
           fail_action: false
 
       # ==========================================
-      # 🏷️ AUTOMATIC TAGGING (RELEASE MANAGEMENT)
+      # 📦 ARCHIVAGE DU BUILD (DIST)
       # ==========================================
-      - name: 🏷️ Create and Push Stable Tag
+      - name: 📦 Archive Production Build
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: |
-          # Génère un tag unique basé sur la date et l'heure (ex: v1.0-20260710-1025)
-          TAG_NAME="v1.0-$(date +'%Y%m%d-%H%M')"
-          echo "Génération du tag stable : $TAG_NAME"
+        run: tar -czf dist.tar.gz dist/
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git tag -a "$TAG_NAME" -m "Build stable validé par la CI DevSecOps [Workflow #${{ github.run_number }}]"
-          git push origin "$TAG_NAME"
+      # ==========================================
+      # 🚀 AUTOMATIC RELEASE & ASSETS
+      # ==========================================
+      - name: 🚀 Create GitHub Release
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v1.0-${{ github.run_number }}"
+          name: "Release v1.0-${{ github.run_number }}"
+          body: "Build stable validé par la CI DevSecOps [Workflow #${{ github.run_number }}]"
+          files: dist.tar.gz
