@@ -1,0 +1,54 @@
+name: 💻 Front-End CI DevSecOps
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  quality-and-tests:
+    name: 🧪 Quality, Lint & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Version stable de pnpm
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🚀 Fast Linting (Oxlint Rust)
+        run: pnpm lint:oxlint
+
+      - name: 🔍 Deep Linting (ESLint)
+        run: pnpm lint:eslint
+
+      - name: ⚙️ Type Checking (TypeScript)
+        run: pnpm type-check
+
+      - name: 🧪 Unit Tests (Vitest)
+        run: pnpm test:unit --run
