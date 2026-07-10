@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-          issues: write
-          contents: read
+      issues: write
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -80,3 +80,19 @@ jobs:
           target: 'http://localhost:4173'
           rules_file_name: '.zap/rules.tsv'
           fail_action: false
+
+      # ==========================================
+      # 🏷️ AUTOMATIC TAGGING (RELEASE MANAGEMENT)
+      # ==========================================
+      - name: 🏷️ Create and Push Stable Tag
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          # Génère un tag unique basé sur la date et l'heure (ex: v1.0-20260710-1025)
+          TAG_NAME="v1.0-$(date +'%Y%m%d-%H%M')"
+          echo "Génération du tag stable : $TAG_NAME"
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$TAG_NAME" -m "Build stable validé par la CI DevSecOps [Workflow #${{ github.run_number }}]"
+          git push origin "$TAG_NAME"
