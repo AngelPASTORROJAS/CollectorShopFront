@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import { collectorAPI } from '@/api';
+import type { ChatMessageDto } from '@/types/models';
 
 export const useChatStore = defineStore('chat', {
   state: () => ({
-    messages: [] as unknown[]
+    messages: [] as ChatMessageDto[]
   }),
   actions: {
     async fetchMessages(itemId: number) {

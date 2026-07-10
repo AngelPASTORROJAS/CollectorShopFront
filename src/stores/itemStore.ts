@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { collectorAPI } from "@/api";
-import type { ItemResponse } from "@/types/models";
+import type { CollectibleItemDto } from "@/types/models";
 
 export const useItemStore = defineStore("item", () => {
-  const items = ref<ItemResponse[]>([]);
+  const items = ref<CollectibleItemDto[]>([]);
   const isLoading = ref<boolean>(false);
 
   async function fetchItems() {
