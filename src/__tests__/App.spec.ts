@@ -3,9 +3,9 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import App from '../App.vue'
 
-// On mocke vue-router de manière isolée avec l'utilitaire "vi"
+// On mocke vue-router de manière isolée en typant le mock de la fonction
 vi.mock('vue-router', () => ({
-  useRoute: vi.fn(() => ({ path: '/' }))
+  useRoute: vi.fn<() => unknown>(() => ({ path: '/' }))
 }))
 
 describe('App', () => {
