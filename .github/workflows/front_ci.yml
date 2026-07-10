@@ -55,3 +55,23 @@ jobs:
 
       - name: 🧪 Unit Tests (Vitest)
         run: pnpm test:unit --run
+
+      # ==========================================
+      # 🛡️ SÉCURITÉ DYNAMIQUE (DAST) - OWASP ZAP
+      # ==========================================
+      - name: 🏗️ Build Front-End for DAST Scan
+        run: pnpm build
+
+      - name: 🌐 Start Local Server for OWASP ZAP
+        run: pnpm exec vite preview --port 4173 &
+
+      - name: ⏱️ Wait for Server Ready
+        run: npx wait-on http://localhost:4173 --timeout 30000
+
+      - name: 🛡️ OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:4173'
+          rules_file_name: '.zap/rules.tsv'
+          fail_action: true
