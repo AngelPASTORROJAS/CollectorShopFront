@@ -8,7 +8,10 @@ vi.mock('vue-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('vue-router')>()
   return {
     ...actual,
-    useRoute: vi.fn<() => unknown>(() => ({ path: '/' }))
+    useRoute: vi.fn<() => unknown>(() => ({
+      path: '/',
+      meta: { isAuthPage: false }
+    }))
   }
 })
 
