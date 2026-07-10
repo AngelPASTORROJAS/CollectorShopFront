@@ -1,12 +1,28 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { compression } from 'vite-plugin-compression2'
+import obfuscator from 'vite-plugin-javascript-obfuscator'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueDevTools()],
+  plugins: [
+    vue(),
+    vueDevTools(),
+    compression({
+      algorithms: ['brotliCompress'],
+      exclude: [/\.(br)$/, /\.(gz)$/]
+    }),
+    obfuscator({
+      options: {
+        compact: true,
+        controlFlowFlattening: false,
+        stringArray: false,
+        stringArrayThreshold: 0.75
+      }
+    })
+    ],
   base: './',
   resolve: {
     alias: {
