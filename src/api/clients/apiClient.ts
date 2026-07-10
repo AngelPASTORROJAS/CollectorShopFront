@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_CONFIG } from '../config/apiConfig'
 import Swal from 'sweetalert2'
-import { useAuthStore } from '@/stores/authStore' // 1. On importe le store ici
+import { useAuthStore } from '@/stores/authStore'
 
 export const apiClient = axios.create({
   baseURL: API_CONFIG.BASE_URL,

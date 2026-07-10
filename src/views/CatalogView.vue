@@ -3,7 +3,11 @@ import { onMounted } from 'vue'
 import { useCatalogStore } from '@/stores/catalogStore'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import { collectorAPI } from '@/api'
+import { useAuthStore } from '@/stores/authStore'
+import Swal from 'sweetalert2'
 
+const authStore = useAuthStore()
 const catalogStore = useCatalogStore()
 const { availableItems, isLoading } = storeToRefs(catalogStore)
 const router = useRouter()
@@ -15,6 +19,35 @@ onMounted(() => {
 const goToDetail = (id: number) => {
   router.push(`/item/${id}`)
 }
+
+const deleteItem = async (event: Event, id: number) => {
+  event.stopPropagation()
+
+  const result = await Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Cette action est irréversible.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Oui, supprimer !',
+    cancelButtonText: 'Annuler'
+  })
+
+  if (result.isConfirmed) {
+    try {
+      const success = await collectorAPI.items.deleteAsync(id)
+      if (success) {
+        await catalogStore.fetchItems()
+        Swal.fire('Supprimé !', 'Votre article a été retiré.', 'success')
+      }
+    } catch (error) {
+      console.error("Erreur suppression :", error)
+      Swal.fire('Erreur', 'Impossible de supprimer l\'article.', 'error')
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -43,6 +76,14 @@ const goToDetail = (id: number) => {
           <!-- Note : Sera vide tant que le SQL ne l'inclut pas, mais le DTO est prêt -->
           <p v-if="item.Description" class="description">{{ item.Description }}</p>
           <div class="seller">Propriétaire #{{ item.OwnerId }}</div>
+
+          <button
+            v-if="authStore.user?.Id === item.OwnerId"
+            class="btn-delete"
+            @click="deleteItem($event, item.Id)"
+          >
+            Supprimer
+          </button>
         </div>
       </div>
     </div>
