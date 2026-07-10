@@ -20,23 +20,19 @@ jobs:
         with:
           node-version: '24'
 
+      # pnpm gère le cache tout seul si on lui demande gentiment
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9 # Version stable de pnpm
+          version: 9
+          run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
+      # L'action officielle de Node peut s'occuper de mapper le cache de pnpm proprement
+      - name: Setup Node with pnpm cache
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
